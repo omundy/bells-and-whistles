@@ -218,17 +218,19 @@ const sounds = {
 
   'train-whistle': () => {
     const c = ctx(), t = c.currentTime;
-    [311.13, 466.16, 622.25].forEach(f => {
+    // Locomotive chord: minor triad with dominant 7th
+    [311.13, 392, 466.16, 622.25].forEach(freq => {
       const o = c.createOscillator(), filt = c.createBiquadFilter(), g = c.createGain();
-      o.type = 'sawtooth'; o.frequency.value = f;
-      filt.type = 'bandpass'; filt.frequency.value = f; filt.Q.value = 8;
+      o.type = 'sawtooth'; o.frequency.value = freq;
+      filt.type = 'bandpass'; filt.frequency.value = freq; filt.Q.value = 6;
       o.connect(filt); filt.connect(g); g.connect(c.destination);
       g.gain.setValueAtTime(0.001, t);
-      g.gain.linearRampToValueAtTime(0.12, t + 0.15);
-      g.gain.setValueAtTime(0.12, t + 1.6);
-      g.gain.linearRampToValueAtTime(0.001, t + 2.0);
-      o.start(t); o.stop(t + 2.1);
+      g.gain.linearRampToValueAtTime( 0.1, t + 0.12);
+      g.gain.setValueAtTime(0.1, t + 1.7);
+      g.gain.linearRampToValueAtTime(0.001, t + 2.1);
+      o.start(t); o.stop(t + 2.15);
     });
+    return 2.2;
   },
 
   'referees-whistle': () => {
