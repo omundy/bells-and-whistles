@@ -123,19 +123,89 @@
 
 <footer>It has all the bells and whistles</footer>
 
+<canvas id="canvas" style="width: 100%; height: 200px; margin: 20px 0; background: black;"></canvas>
+
+<script>
+// ─── Visualizer (shows whatever sound is currently playing) ────────────────
+const canvas = document.getElementById("canvas");
+const canvasContext = canvas.getContext("2d");
+let animationId;
+
+function draw() {
+  animationId = requestAnimationFrame(draw);
+
+  const analyser = bus();
+  const dataArray = busData();
+  analyser.getByteTimeDomainData(dataArray);
+
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+
+  canvasContext.fillStyle = "black";
+  canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+
+  canvasContext.lineWidth = 2;
+  canvasContext.strokeStyle = "lime";
+  canvasContext.beginPath();
+
+  const sliceWidth = canvas.width / dataArray.length;
+  let x = 0;
+
+  for (let i = 0; i < dataArray.length; i++) {
+    const v = dataArray[i] / 128.0;
+    const y = (v * canvas.height) / 2;
+
+    if (i === 0) {
+      canvasContext.moveTo(x, y);
+    } else {
+      canvasContext.lineTo(x, y);
+    }
+    x += sliceWidth;
+  }
+
+  canvasContext.stroke();
+}
+
+function startVisualizer() {
+  if (!animationId) draw();
+}
+</script>
+
 <script>
 // ─── Audio Context ─────────────────────────────────────────────────────────
 let _ctx = null;
 function ctx() {
-  if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!_ctx) {
+      _ctx = new (window.AudioContext || window.webkitAudioContext)();
+  }
   if (_ctx.state === 'suspended') _ctx.resume();
   return _ctx;
+}
+
+// ─── Visualizer bus ────────────────────────────────────────────────────────
+// All sounds connect here (instead of straight to c.destination) so the
+// canvas visualizer can see whatever bell/whistle is currently playing.
+let _analyser = null;
+let _analyserData = null;
+function bus() {
+  const c = ctx();
+  if (!_analyser) {
+    _analyser = c.createAnalyser();
+    _analyser.fftSize = 2048;
+    _analyserData = new Uint8Array(_analyser.fftSize);
+    _analyser.connect(c.destination);
+  }
+  return _analyser;
+}
+function busData() {
+  bus();
+  return _analyserData;
 }
 
 function osc(freq, type, gainVal, startT, stopT, destNode) {
   const c = ctx(), o = c.createOscillator(), g = c.createGain();
   o.type = type; o.frequency.value = freq;
-  o.connect(g); g.connect(destNode || c.destination);
+  o.connect(g); g.connect(destNode || bus());
   g.gain.setValueAtTime(gainVal, startT);
   g.gain.exponentialRampToValueAtTime(0.001, stopT);
   o.start(startT); o.stop(stopT + 0.01);
@@ -145,7 +215,7 @@ function osc(freq, type, gainVal, startT, stopT, destNode) {
 function bell(freq, vol, delay, dur, harmonics=[1,2.756,5.404]) {
   const c = ctx(), t = c.currentTime + delay;
   harmonics.forEach((h, i) => {
-    osc(freq * h, 'sine', vol / (i * 0.8 + 1), t, t + dur, c.destination);
+    osc(freq * h, 'sine', vol / (i * 0.8 + 1), t, t + dur, bus());
   });
 }
 
@@ -172,7 +242,7 @@ const sounds = {
     [562, 845].forEach(f => {
       const o = c.createOscillator(), g = c.createGain();
       o.type = 'square'; o.frequency.value = f;
-      o.connect(g); g.connect(c.destination);
+      o.connect(g); g.connect(bus());
       g.gain.setValueAtTime(0.12, t);
       g.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
       o.start(t); o.stop(t + 1.05);
@@ -207,7 +277,7 @@ const sounds = {
       const t = c.currentTime + i * 0.28;
       const o = c.createOscillator(), g = c.createGain();
       o.type = 'sine'; o.frequency.value = f;
-      o.connect(g); g.connect(c.destination);
+      o.connect(g); g.connect(bus());
       g.gain.setValueAtTime(0.001, t);
       g.gain.linearRampToValueAtTime(0.25, t + 0.04);
       g.gain.setValueAtTime(0.25, t + 0.22);
@@ -223,7 +293,7 @@ const sounds = {
       const o = c.createOscillator(), filt = c.createBiquadFilter(), g = c.createGain();
       o.type = 'sawtooth'; o.frequency.value = freq;
       filt.type = 'bandpass'; filt.frequency.value = freq; filt.Q.value = 6;
-      o.connect(filt); filt.connect(g); g.connect(c.destination);
+      o.connect(filt); filt.connect(g); g.connect(bus());
       g.gain.setValueAtTime(0.001, t);
       g.gain.linearRampToValueAtTime( 0.1, t + 0.12);
       g.gain.setValueAtTime(0.1, t + 1.7);
@@ -240,7 +310,7 @@ const sounds = {
     lfo.frequency.value = 38; lg.gain.value = 0.28;
     lfo.connect(lg); lg.connect(g.gain);
     o.type = 'sine'; o.frequency.value = 3500;
-    o.connect(g); g.connect(c.destination);
+    o.connect(g); g.connect(bus());
     g.gain.setValueAtTime(0.001, t);
     g.gain.linearRampToValueAtTime(0.38, t + 0.04);
     g.gain.setValueAtTime(0.38, t + 0.6);
@@ -258,7 +328,7 @@ const sounds = {
       lfo.frequency.value = 28; lg.gain.value = 0.22;
       lfo.connect(lg); lg.connect(g.gain);
       o.type = 'sine'; o.frequency.value = 2800;
-      o.connect(g); g.connect(c.destination);
+      o.connect(g); g.connect(bus());
       g.gain.setValueAtTime(0.001, t);
       g.gain.linearRampToValueAtTime(0.32, t + 0.04);
       g.gain.setValueAtTime(0.32, t + 0.4);
@@ -272,7 +342,7 @@ const sounds = {
     const c = ctx(), t = c.currentTime;
     const o = c.createOscillator(), g = c.createGain();
     o.type = 'sine'; o.frequency.value = 18500;
-    o.connect(g); g.connect(c.destination);
+    o.connect(g); g.connect(bus());
     g.gain.setValueAtTime(0.6, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
     o.start(t); o.stop(t + 1.1);
@@ -282,17 +352,53 @@ const sounds = {
     const c = ctx(), t = c.currentTime;
     const o = c.createOscillator(), g = c.createGain();
     o.type = 'sine';
-    o.frequency.setValueAtTime(500, t);
-    o.frequency.setValueAtTime(500, t + 0.15);
-    o.frequency.linearRampToValueAtTime(1200, t + 0.35);
-    o.frequency.setValueAtTime(1200, t + 0.45);
-    o.frequency.linearRampToValueAtTime(800, t + 0.75);
-    o.connect(g); g.connect(c.destination);
-    g.gain.setValueAtTime(0.001, t);
-    g.gain.linearRampToValueAtTime(0.32, t + 0.05);
-    g.gain.setValueAtTime(0.32, t + 0.7);
-    g.gain.linearRampToValueAtTime(0.001, t + 0.8);
-    o.start(t); o.stop(t + 0.85);
+
+
+// Wolf whistle pitch structure: Starts low, slides up, then drops lower and slides up again
+  const now = t;
+  const startFreq = 1000;  // Starting pitch (Hz)
+  const peakFreq = 2000;   // High peak pitch (Hz)
+  const dipFreq = 1500;    // Dip pitch (Hz)
+
+//   // Schedule the pitch changes
+//   o.frequency.setValueAtTime(startFreq, now);
+//   // Slide up to the high pitch
+//   o.frequency.exponentialRampToValueAtTime(peakFreq, now + 0.15);
+//   // Slide down to a low pitch
+//   o.frequency.exponentialRampToValueAtTime(dipFreq, now + 0.3);
+//   // Final slide up to end the whistle
+//   o.frequency.exponentialRampToValueAtTime(peakFreq, now + 0.45);
+
+// o.connect(g); g.connect(bus());
+
+//   // Fade the volume in and out to prevent popping or clicking noises
+//   g.gain.setValueAtTime(0, now);
+//   g.gain.linearRampToValueAtTime(1, now + 0.05);
+//   g.gain.setValueAtTime(1, now + 0.4);
+//   g.gain.linearRampToValueAtTime(0, now + 0.6);
+
+//   // Start the sound and schedule it to stop after the whistle finishes
+//   o.start(now);
+//   o.stop(now + 0.6);
+
+  const times = [t + 0, t + 0.15, t + 0.5, t + 0.6, t + 0.75, t + 1.2, t + 1.8];
+
+    o.frequency.setValueAtTime(startFreq,times[0]);
+    o.frequency.setValueAtTime(startFreq, times[1]);
+    o.frequency.linearRampToValueAtTime(peakFreq, times[2]);
+    o.frequency.setValueAtTime(peakFreq, times[3]);
+    o.frequency.linearRampToValueAtTime(dipFreq, times[4]);
+    o.frequency.setValueAtTime(peakFreq, times[5]);
+    o.frequency.setValueAtTime(peakFreq, times[6]);
+    o.connect(g); g.connect(bus());
+    g.gain.setValueAtTime(0.001, times[0]);
+    g.gain.linearRampToValueAtTime(0.32, times[1]);
+    g.gain.setValueAtTime(0.32, times[2]);
+    g.gain.linearRampToValueAtTime(0.001, times[3]);
+    g.gain.linearRampToValueAtTime(0.32, times[4]);
+    g.gain.setValueAtTime(0.32, times[5]);
+    g.gain.linearRampToValueAtTime(0.001, times[6]);
+    o.start(t); o.stop(times[6]);
   },
 
   'swanee-whistle': () => {
@@ -304,7 +410,7 @@ const sounds = {
     o.frequency.linearRampToValueAtTime(250, t + 1.1);
     o.frequency.linearRampToValueAtTime(700, t + 1.5);
     o.frequency.linearRampToValueAtTime(400, t + 1.9);
-    o.connect(g); g.connect(c.destination);
+    o.connect(g); g.connect(bus());
     g.gain.setValueAtTime(0.001, t);
     g.gain.linearRampToValueAtTime(0.28, t + 0.05);
     g.gain.setValueAtTime(0.28, t + 1.85);
@@ -317,7 +423,7 @@ const sounds = {
     [[2093, 0.28], [4186, 0.08]].forEach(([f, v]) => {
       const o = c.createOscillator(), g = c.createGain();
       o.type = 'sine'; o.frequency.value = f;
-      o.connect(g); g.connect(c.destination);
+      o.connect(g); g.connect(bus());
       g.gain.setValueAtTime(0.001, t);
       g.gain.linearRampToValueAtTime(v, t + 0.25);
       g.gain.setValueAtTime(v, t + 1.8);
@@ -330,7 +436,7 @@ const sounds = {
     const c = ctx(), t = c.currentTime;
     const o = c.createOscillator(), g = c.createGain();
     o.type = 'sine'; o.frequency.value = 1760;
-    o.connect(g); g.connect(c.destination);
+    o.connect(g); g.connect(bus());
     g.gain.setValueAtTime(0.001, t);
     g.gain.linearRampToValueAtTime(0.38, t + 0.06);
     g.gain.setValueAtTime(0.38, t + 2.2);
@@ -662,6 +768,7 @@ function renderItem(item, container) {
     fn();
     const dur = durations[item.id] || 2;
     animateNeedle(item.id, dur);
+    startVisualizer();
     if (!playing) {
       playing = true;
       div.classList.add('ringing');
