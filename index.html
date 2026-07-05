@@ -12,7 +12,9 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>The New Sound System</h1>
+    <h1>
+      <img src="img/title.png" alt="The New Sound System" class="title-img" />
+    </h1>
 
     <div class="main-grid">
       <div class="section" id="bells"></div>
@@ -20,7 +22,19 @@
       <div class="section" id="whistles"></div>
     </div>
 
-    <footer>It has all the bells and whistles</footer>
+    <footer>It has all the bells and whistles
+
+    </footer>
+
+
+
+
+    <div class="credit">
+      <p>
+        Based on a <a href="https://cartoonchurch.com/content/cc/sound-system/" target="_blank">drawing</a> by Dave Walker
+      </p>
+    </div>
+
 
     <canvas
       id="canvas"
@@ -708,30 +722,30 @@
 
         let svg = `<svg id="dial-${id}" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" xmlns="http://www.w3.org/2000/svg">`;
 
-        // Outer circle
-        svg += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="white" stroke="#111" stroke-width="1.8"/>`;
+        // // Outer circle
+        // svg += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="white" stroke="#111" stroke-width="1.8"/>`;
 
-        // Minor ticks (55 intervals)
-        for (let t = 0; t <= 55; t++) {
-          if (t % 5 === 0) continue;
-          const a = 120 + (t / 55) * 300;
-          const [x1, y1] = pt(a, R - 1.5);
-          const [x2, y2] = pt(a, R - 5);
-          svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#111" stroke-width="0.7"/>`;
-        }
+        // // Minor ticks (55 intervals)
+        // for (let t = 0; t <= 55; t++) {
+        //   if (t % 5 === 0) continue;
+        //   const a = 120 + (t / 55) * 300;
+        //   const [x1, y1] = pt(a, R - 1.5);
+        //   const [x2, y2] = pt(a, R - 5);
+        //   svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#111" stroke-width="0.7"/>`;
+        // }
 
-        // Major ticks & numbers (0–11)
-        for (let n = 0; n <= 11; n++) {
-          const a = angleForN(n);
-          const [x1, y1] = pt(a, R - 1.5);
-          const [x2, y2] = pt(a, R - 8);
-          const [nx, ny] = pt(a, R - 16);
-          svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#111" stroke-width="1.5"/>`;
-          svg += `<text x="${nx.toFixed(1)}" y="${ny.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="7.5" font-family="Patrick Hand,sans-serif" font-weight="bold">${n}</text>`;
-        }
+        // // Major ticks & numbers (0–11)
+        // for (let n = 0; n <= 11; n++) {
+        //   const a = angleForN(n);
+        //   const [x1, y1] = pt(a, R - 1.5);
+        //   const [x2, y2] = pt(a, R - 8);
+        //   const [nx, ny] = pt(a, R - 16);
+        //   svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#111" stroke-width="1.5"/>`;
+        //   svg += `<text x="${nx.toFixed(1)}" y="${ny.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="7.5" font-family="Patrick Hand,sans-serif" font-weight="bold">${n}</text>`;
+        // }
 
-        // Icon (centered)
-        svg += `<g transform="translate(${cx},${cy})" style="pointer-events:none">${iconSVG}</g>`;
+        // // Icon (centered)
+        // svg += `<g transform="translate(${cx},${cy})" style="pointer-events:none">${iconSVG}</g>`;
 
         // Pivot
         svg += `<circle cx="${cx}" cy="${cy}" r="3.5" fill="#111"/>`;
@@ -822,6 +836,11 @@
         wrap.className = "dial-wrap";
         wrap.innerHTML = buildDial(item.id, item.icon);
 
+
+        const bg = document.createElement("div");
+        bg.className = "dial-bg";
+        bg.innerHTML = `<img src="img/${item.id}.png" class="dial-bg" alt="" />`;
+
         const lbl = document.createElement("div");
         lbl.className = "label";
         lbl.innerHTML = item.label.replace(/\n/g, "<br>");
@@ -833,6 +852,7 @@
           div.appendChild(note);
         }
 
+        div.appendChild(bg);
         div.appendChild(wrap);
         div.appendChild(lbl);
 
