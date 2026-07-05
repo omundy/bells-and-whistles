@@ -22,24 +22,20 @@
       <div class="section" id="whistles"></div>
     </div>
 
-    <footer>It has all the bells and whistles
+    <footer>It has all the bells and whistles</footer>
 
-    </footer>
-
-
-
-
-    <div class="credit">
-      <p>
-        Based on a <a href="https://cartoonchurch.com/content/cc/sound-system/" target="_blank">drawing</a> by Dave Walker
-      </p>
-    </div>
 
 
     <canvas
       id="canvas"
-      style="width: 100%; height: 200px; margin: 20px 0; background: rgb(255, 255, 255)"
+      style="width: 100%; height: 200px; margin:  0; background: rgb(255, 255, 255)"
     ></canvas>
+
+
+    <div class="credit">
+        Based on a <a href="https://cartoonchurch.com/content/cc/sound-system/" target="_blank">drawing</a> by Dave Walker
+    </div>
+
 
     <script>
       // ─── Visualizer (shows whatever sound is currently playing) ────────────────
@@ -86,7 +82,7 @@
           }
           x += sliceWidth;
         }
-        if (maxY > 100)
+        // if (maxY > 100)
           canvasContext.stroke();
       }
 
