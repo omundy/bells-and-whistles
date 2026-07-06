@@ -22,20 +22,33 @@
       <div class="section" id="whistles"></div>
     </div>
 
-    <footer>It has all the bells and whistles</footer>
-
-
+    <footer>
+      <img
+        src="img/sub-title.png"
+        alt="It has all the bells and whistles"
+        class="sub-title-img"
+      />
+    </footer>
 
     <canvas
       id="canvas"
-      style="width: 100%; height: 200px; margin:  0; background: rgb(255, 255, 255)"
+      style="
+        width: 100%;
+        height: 200px;
+        margin: 0;
+        background: rgb(255, 255, 255);
+      "
     ></canvas>
 
-
     <div class="credit">
-        Based on a <a href="https://cartoonchurch.com/content/cc/sound-system/" target="_blank">drawing</a> by Dave Walker
+      Based on a
+      <a
+        href="https://cartoonchurch.com/content/cc/sound-system/"
+        target="_blank"
+        >drawing</a
+      >
+      by Dave Walker
     </div>
-
 
     <script>
       // ─── Visualizer (shows whatever sound is currently playing) ────────────────
@@ -83,8 +96,8 @@
           x += sliceWidth;
         }
         // if (maxY > 100)
-        
-          canvasContext.stroke();
+
+        canvasContext.stroke();
       }
 
       function startVisualizer() {
@@ -320,7 +333,6 @@
           o.stop(t + 1.1);
         },
 
-
         // reference
         // https://www.pond5.com/sound-effects/item/122161289-whistle-desire-wolf-whistle?dd_referrer=https%3A%2F%2Fwww.google.com%2F
         "wolf-whistle": () => {
@@ -329,7 +341,7 @@
           const lfo = c.createOscillator(),
             o = c.createOscillator(),
             g = c.createGain();
-          lfo.frequency.value = 18;  
+          lfo.frequency.value = 18;
           lfo.connect(g);
           o.type = "sine";
 
@@ -339,52 +351,47 @@
           const peakFreq = 2000; // High peak pitch (Hz)
           const dipFreq = 1500; // Dip pitch (Hz)
 
-
-
-          o.frequency.setValueAtTime(0,             t + 0);
-          g.gain.setValueAtTime(0.001,              t + 0);
+          o.frequency.setValueAtTime(0, t + 0);
+          g.gain.setValueAtTime(0.001, t + 0);
 
           o.frequency.linearRampToValueAtTime(500, t + 0.2);
-          g.gain.linearRampToValueAtTime(0.2,      t + 0.2);
+          g.gain.linearRampToValueAtTime(0.2, t + 0.2);
 
-          o.frequency.setValueAtTime(500,         t + 0.4);
-          g.gain.linearRampToValueAtTime(0.1,     t + 0.4);
+          o.frequency.setValueAtTime(500, t + 0.4);
+          g.gain.linearRampToValueAtTime(0.1, t + 0.4);
 
           o.frequency.linearRampToValueAtTime(2000, t + 0.6);
-          g.gain.linearRampToValueAtTime(0.8,       t + 0.6);
+          g.gain.linearRampToValueAtTime(0.8, t + 0.6);
 
           o.frequency.linearRampToValueAtTime(1000, t + 0.8);
-          g.gain.linearRampToValueAtTime(0,       t + 0.8);
+          g.gain.linearRampToValueAtTime(0, t + 0.8);
 
-
-
-          o.frequency.setValueAtTime(0,             t + 1.0);
-          g.gain.setValueAtTime(0.001,              t + 1.0);
+          o.frequency.setValueAtTime(0, t + 1.0);
+          g.gain.setValueAtTime(0.001, t + 1.0);
 
           o.frequency.linearRampToValueAtTime(500, t + 1.1);
-          g.gain.linearRampToValueAtTime(0.2,      t + 1.2);
+          g.gain.linearRampToValueAtTime(0.2, t + 1.2);
 
-          o.frequency.setValueAtTime(500,             t + 1.4);
-          g.gain.setValueAtTime(0.2,              t + 1.4);
+          o.frequency.setValueAtTime(500, t + 1.4);
+          g.gain.setValueAtTime(0.2, t + 1.4);
 
           o.frequency.linearRampToValueAtTime(2000, t + 1.6);
-          g.gain.linearRampToValueAtTime(0.8,      t + 1.6);
+          g.gain.linearRampToValueAtTime(0.8, t + 1.6);
 
-          o.frequency.setValueAtTime(2000,             t + 1.7);
-          g.gain.setValueAtTime(0.8,              t + 1.7);
+          o.frequency.setValueAtTime(2000, t + 1.7);
+          g.gain.setValueAtTime(0.8, t + 1.7);
 
           o.frequency.linearRampToValueAtTime(1000, t + 1.8);
-          g.gain.linearRampToValueAtTime(0.4,      t + 1.8);
+          g.gain.linearRampToValueAtTime(0.4, t + 1.8);
 
           o.frequency.linearRampToValueAtTime(500, t + 2.2);
-          g.gain.linearRampToValueAtTime(0.2,      t + 2.2);
+          g.gain.linearRampToValueAtTime(0.2, t + 2.2);
 
           o.frequency.linearRampToValueAtTime(250, t + 2.4);
-          g.gain.linearRampToValueAtTime(0.1,      t + 2.4);
+          g.gain.linearRampToValueAtTime(0.1, t + 2.4);
 
-          o.frequency.setValueAtTime(0,             t + 2.4);
-          g.gain.setValueAtTime(0.001,              t + 2.4);
-
+          o.frequency.setValueAtTime(0, t + 2.4);
+          g.gain.setValueAtTime(0.001, t + 2.4);
 
           o.connect(g);
           g.connect(bus());
@@ -832,7 +839,6 @@
         const wrap = document.createElement("div");
         wrap.className = "dial-wrap";
         wrap.innerHTML = buildDial(item.id, item.icon);
-
 
         const bg = document.createElement("div");
         bg.className = "dial-bg";
