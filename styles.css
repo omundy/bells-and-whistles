@@ -8,7 +8,7 @@
 
 body {
   background: #fff;
-  font-family: "Patrick Hand", "Comic Sans MS", cursive, sans-serif;
+  font-family: sans-serif;
   max-width: 960px;
   margin: 0 auto;
   padding: 24px 16px 32px;
@@ -27,6 +27,14 @@ h1 img.title-img {
   max-width: 80%;
   height: auto;
   text-align: center;
+}
+
+.sound-note {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 footer img.sub-title-img {
   max-width: 50%;
